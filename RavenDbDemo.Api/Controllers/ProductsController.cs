@@ -38,8 +38,9 @@ namespace RavenDbDemo.Api.Controllers
                 var product = new Product(string.Empty, $"name_{Guid.NewGuid()}", random.Next(1000), random.Next(15));
 
                 await _asyncDocumentSession.StoreAsync(product);
-                await _asyncDocumentSession.SaveChangesAsync();
             }
+
+            await _asyncDocumentSession.SaveChangesAsync();
 
             return Ok();
         }

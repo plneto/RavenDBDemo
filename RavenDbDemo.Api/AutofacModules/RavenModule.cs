@@ -31,6 +31,7 @@
 
                     store.Initialize();
 
+                    // ensure db is created
                     var database = store.Maintenance.Server.Send(new GetDatabaseRecordOperation(_setting.Database));
 
                     if (database is null)
@@ -38,6 +39,15 @@
                         store.Maintenance.Server.Send(
                             new CreateDatabaseOperation(new DatabaseRecord(_setting.Database)));
                     }
+
+                    return store;
+                })
+                .As<IDocumentStore>()
+                .SingleInstance();
+
+            builder.Register(ctx =>
+                {
+                    var store = ctx.Resolve<IDocumentStore>();
 
                     return store.OpenAsyncSession();
                 })
