@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Sparrow.Collections;
 
 namespace RavenDbDemo.Api.Controllers
 {
@@ -23,7 +24,18 @@ namespace RavenDbDemo.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> Get()
         {
-            var products = await _asyncDocumentSession.Query<Product>().ToListAsync();
+            var products = await _asyncDocumentSession.Query<Product>()
+                .ToListAsync();
+
+            return products;
+        }
+
+        [HttpGet("search/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<Product>>> SearchByName(string searchTerm)
+        {
+            var products = await _asyncDocumentSession.Query<Product>()
+                .Search(x => x.Name, searchTerm)
+                .ToListAsync();
 
             return products;
         }
