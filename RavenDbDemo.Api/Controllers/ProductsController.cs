@@ -45,9 +45,7 @@ namespace RavenDbDemo.Api.Controllers
         {
             for (var i = 0; i < count; i++)
             {
-                var random = new Random(DateTime.Now.Millisecond);
-
-                var product = new Product(string.Empty, $"name_{Guid.NewGuid()}", random.Next(1000), random.Next(15));
+                var product = new Product(string.Empty, $"name_{i}", i * 5, i);
 
                 await _asyncDocumentSession.StoreAsync(product);
             }
