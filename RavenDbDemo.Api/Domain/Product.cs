@@ -6,16 +6,19 @@
 
         public string Name { get; private set; }
 
+        public string Description { get; private set; }
+
         public decimal Price { get; private set; }
 
         public decimal Discount { get; private set; }
 
         public int QtyInStock { get; private set; }
 
-        public Product(string id, string name, decimal price, decimal discount, int qtyInStock)
+        public Product(string id, string name, string description, decimal price, decimal discount, int qtyInStock)
         {
             Id = id;
             Name = name;
+            Description = description;
             Price = price;
             Discount = discount;
             QtyInStock = qtyInStock;

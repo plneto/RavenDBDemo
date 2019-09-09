@@ -42,6 +42,7 @@
                     }
 
                     // add indexes
+                    new Products_ByName().Execute(store);
                     new Products_FinalPrice().Execute(store);
 
                     return store;

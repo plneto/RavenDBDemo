@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Sparrow.Collections;
 
 namespace RavenDbDemo.Api.Controllers
 {
@@ -48,12 +47,23 @@ namespace RavenDbDemo.Api.Controllers
             return products;
         }
 
-        [HttpGet("search/{searchTerm}")]
+        [HttpGet("searchByName/{searchTerm}")]
         public async Task<ActionResult<IEnumerable<Product>>> SearchByName(string searchTerm)
         {
             var products = await _asyncDocumentSession
-                .Query<Product>()
+                .Query<Product, Products_ByName>()
                 .Search(x => x.Name, searchTerm)
+                .ToListAsync();
+
+            return products;
+        }
+
+        [HttpGet("searchDescription/{searchTerm}")]
+        public async Task<ActionResult<IEnumerable<Product>>> SearchDescription(string searchTerm)
+        {
+            var products = await _asyncDocumentSession
+                .Query<Product>()
+                .Search(x => x.Description, searchTerm)
                 .ToListAsync();
 
             return products;
@@ -66,7 +76,7 @@ namespace RavenDbDemo.Api.Controllers
 
             for (var i = 0; i < count; i++)
             {
-                var product = new Product(string.Empty, $"name_{i}", random.Next(100), random.Next(20), random.Next(0, 10));
+                var product = new Product(string.Empty, $"name_{i}", $"description {i}", random.Next(100), random.Next(20), random.Next(0, 10));
 
                 await _asyncDocumentSession.StoreAsync(product);
             }
