@@ -5,8 +5,10 @@ using Sparrow.Collections;
 namespace RavenDbDemo.Api.Controllers
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Domain;
+    using Indexes;
     using Raven.Client.Documents;
     using Raven.Client.Documents.Session;
 
@@ -24,8 +26,24 @@ namespace RavenDbDemo.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> Get()
         {
-            var products = await _asyncDocumentSession.Query<Product>()
+            var products = await _asyncDocumentSession
+                .Query<Product>()
                 .ToListAsync();
+
+            return products;
+        }
+
+        [HttpGet("minPriceFilter/{minFinalPrice}")]
+        public async Task<ActionResult<IEnumerable<Product>>> FilterByFinalPrice(decimal minFinalPrice)
+        {
+            var products = await _asyncDocumentSession
+                .Query<Products_FinalPrice.Result, Products_FinalPrice>()
+                .Statistics(out QueryStatistics stats)
+                .Where(x => x.FinalPrice > minFinalPrice)
+                .OfType<Product>()
+                .ToListAsync();
+
+            var totalResults = stats.TotalResults;
 
             return products;
         }
@@ -33,7 +51,8 @@ namespace RavenDbDemo.Api.Controllers
         [HttpGet("search/{searchTerm}")]
         public async Task<ActionResult<IEnumerable<Product>>> SearchByName(string searchTerm)
         {
-            var products = await _asyncDocumentSession.Query<Product>()
+            var products = await _asyncDocumentSession
+                .Query<Product>()
                 .Search(x => x.Name, searchTerm)
                 .ToListAsync();
 
@@ -43,9 +62,11 @@ namespace RavenDbDemo.Api.Controllers
         [HttpPost("seed/{count}")]
         public async Task<ActionResult> Seed(int count)
         {
+            var random = new Random(DateTime.Now.Millisecond);
+
             for (var i = 0; i < count; i++)
             {
-                var product = new Product(string.Empty, $"name_{i}", i * 5, i);
+                var product = new Product(string.Empty, $"name_{i}", random.Next(100), random.Next(20), random.Next(0, 10));
 
                 await _asyncDocumentSession.StoreAsync(product);
             }

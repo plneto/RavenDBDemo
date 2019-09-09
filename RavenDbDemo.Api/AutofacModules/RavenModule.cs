@@ -1,6 +1,7 @@
 ﻿namespace RavenDbDemo.Api.AutofacModules
 {
     using Autofac;
+    using Indexes;
     using Raven.Client.Documents;
     using Raven.Client.Documents.Session;
     using Raven.Client.ServerWide;
@@ -39,6 +40,9 @@
                         store.Maintenance.Server.Send(
                             new CreateDatabaseOperation(new DatabaseRecord(_setting.Database)));
                     }
+
+                    // add indexes
+                    new Products_FinalPrice().Execute(store);
 
                     return store;
                 })
